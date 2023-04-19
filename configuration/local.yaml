@@ -1,0 +1,19 @@
+source:
+  uri: couchbase://localhost
+  bucket: default
+  user: default
+  password: default
+  name: src
+
+destination:
+  uri: couchbase://localhost
+  bucket: default
+  user: default
+  password: default
+  name: dst
+
+generator:
+  ttl: 150s
+  size: 200
+
+key: cb-repl-ping-document-key
