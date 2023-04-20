@@ -2,6 +2,17 @@
 
 Tool that allows to perform round-trip communication (write-read-overwrite-read) based on [XDCR](https://docs.couchbase.com/server/current/learn/clusters-and-availability/xdcr-overview.html) in order to measure replication latency in both directions simultaneously.
 
+# Do you need a fast track to examine replication lag?
+
+1. Prepare config that contains configuration that allows to connect to buckets: [example](./configuration/local.yaml)
+2. There is ready to use docker:
+
+```
+CONFIG=/path/to/your/config.yaml
+docker run -v ${CONFIG}:/config.yml ziollek/cb-tracker:latest oneway
+```
+Please check below information to know what else can you achieve and how to interpret command output.
+
 ## build
 
 make build
@@ -16,18 +27,62 @@ notes: example config can be found in [configuration/local.yaml](./configuration
 
 ## configuration file
 
-TBD
+The example configuration is presented below:
+
+```yaml
+source:
+  uri: couchbase://localhost
+  bucket: default
+  user: default
+  password: default
+  name: src
+
+destination:
+  uri: couchbase://localhost
+  bucket: default
+  user: default
+  password: default
+  name: dst
+
+generator:
+  ttl: 150s
+  size: 200
+
+key: cb-repl-ping-document-key
+```
+
+source & destination keys has exactly the same structure and represents connection string to couchbase bucket, details are described below:
+
+| key      | description                                                                |
+|----------|----------------------------------------------------------------------------|
+| uri      | couchbase url in format couchbase://[couchnase-host-ip-or-hostname]        |
+| bucket   | bucket name                                                                |
+| user     | credentials: username                                                      |
+| password | credentials: password                                                      |
+| name| name that is used internally to distinguished source & destinantion bucket |
+
+additionally you can find here parameters that are used to generate documents while testing replication:
+
+| key  | description                                                                         |
+|------|-------------------------------------------------------------------------------------|
+| ttl  | ttl of documents that are generated during tests |
+| size | size in bytes of data field of documents that are generated during tests, it worth mentioning that document consists of several additional fields and are a little bigger than defined size|
+| key  | depending of command it is key that is used for storing testing documents or prefix of documents key |
 
 
-## what kind of modes it supports?
+## what kind of tests/modes it supports?
 
 ### ping mode - checks full round trip replication time
 
 1. PING
+
    a. store -> bucketA -> replication -> bucketB
+
    b. fetch <- bucketB (with retires)
 2. PONG
+
    a. store -> bucketB -> replication -> bucketA
+
    b. fetch <- bucketA (with retires)
 
 #### example output

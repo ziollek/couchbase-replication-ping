@@ -2,11 +2,12 @@ BINARY_NAME=cb-tracker
 BINARY_FILE := ./bin/$(BINARY_NAME)
 GOTEST_DIR := test-results
 GOTEST_FLAGS := -cover -race -v -count=1 -timeout 60s
+FULLIMAGE=ziollek/$(BINARY_NAME):$(VERSION)
 
 VERSION ?= local
 SCM_COMMIT ?= `git rev-parse HEAD`
 
-.PHONY: build test run
+.PHONY: build test run build-image
 build:
 	@echo ">> building application"
 	go build -trimpath -ldflags \
@@ -14,6 +15,10 @@ build:
 	-X main.SCMCommit=$(SCM_COMMIT)" \
 	-o $(BINARY_FILE) \
 	./cmd/...
+
+build-image:
+	@echo ">> building docker image: $(FULLIMAGE)"
+	docker build -f docker/Dockerfile -t $(FULLIMAGE) .
 
 run:
 	go run ./cmd/cp-repl-ping
