@@ -1,4 +1,4 @@
-BINARY_NAME=cp-repl
+BINARY_NAME=cb-tracker
 BINARY_FILE := ./bin/$(BINARY_NAME)
 GOTEST_DIR := test-results
 GOTEST_FLAGS := -cover -race -v -count=1 -timeout 60s

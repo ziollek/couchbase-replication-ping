@@ -12,8 +12,22 @@ type Packet interface {
 	GetSize() int
 }
 
+type Timing interface {
+	AddPhase(phase string) Timing
+	AddPhaseTry(phase string) Timing
+	AddChild(phase string, timing Timing)
+	GetPhases() []string
+	GetPhase(phase string) time.Duration
+	GetDuration() time.Duration
+	GetRetries() int
+}
+
 type Generator interface {
-	Generate(string, string) Packet
+	Generate(key, origin string) Packet
+}
+
+type KeyGenerator interface {
+	Generate() string
 }
 
 type Channel interface {
@@ -22,6 +36,6 @@ type Channel interface {
 }
 
 type Pinger interface {
-	Ping(context.Context, string) error
-	Pong(context.Context, string) error
+	Ping(ctx context.Context, key string) (Timing, error)
+	Pong(ctx context.Context, key string) (Timing, error)
 }

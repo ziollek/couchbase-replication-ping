@@ -3,6 +3,7 @@ package pinger
 import (
 	kv "github.com/ziollek/couchbase-replication-ping/pkg/kv/interfaces"
 	"github.com/ziollek/couchbase-replication-ping/pkg/pinger/interfaces"
+	"github.com/ziollek/couchbase-replication-ping/pkg/pinger/model"
 )
 
 type KVChannel struct {
@@ -15,7 +16,7 @@ func (channel *KVChannel) Send(packet interfaces.Packet) error {
 }
 
 func (channel *KVChannel) Receive(key string) (interfaces.Packet, error) {
-	var p PingPacket
+	var p model.PingPacket
 	err := channel.destination.Get(key, &p)
 	return &p, err
 }

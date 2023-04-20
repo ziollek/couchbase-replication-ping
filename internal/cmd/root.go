@@ -1,19 +1,22 @@
 package cmd
 
 import (
-	"fmt"
+	"github.com/ziollek/couchbase-replication-ping/internal/cmd/utils"
 	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
+var (
+	cfgFile    string
+	jsonOutput bool
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "cp-repl",
-	Short: "cp-repl is tool for measuring replication latency between couchbase bucket connected via XDCR",
+	Use:   "cb-tracker",
+	Short: "cb-tracker is tool for measuring replication latencies in variety of ways",
 	Long: `It operates analogically as ping tool for examining network round-trip-time'
 In such a case:
 - network is set of couchbase clusters
@@ -36,11 +39,13 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cp-repl.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cb-tracker.yaml)")
+	rootCmd.PersistentFlags().BoolVar(&jsonOutput, "json", false, "output as a json")
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	utils.ConfigureLogger(jsonOutput)
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
@@ -52,16 +57,15 @@ func initConfig() {
 		// Search config in home directory with name ".internal" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigType("yaml")
-		viper.SetConfigName(".cp-repl")
+		viper.SetConfigName(".cb-tracker")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
-
+	logger := utils.GetLogger()
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+		logger.Infof("Using config file: %s", viper.ConfigFileUsed())
 	} else {
-		fmt.Println("Cannot find any config")
-		os.Exit(1)
+		logger.Fatal("Cannot find any config")
 	}
 }

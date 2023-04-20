@@ -1,11 +1,42 @@
-package pinger
+package model
 
 import (
+	"fmt"
 	"github.com/ziollek/couchbase-replication-ping/pkg/config"
 	"github.com/ziollek/couchbase-replication-ping/pkg/pinger/interfaces"
 	"strings"
 	"time"
 )
+
+type RandomKeyGenerator struct {
+	prefix string
+	length int
+}
+
+func (g *RandomKeyGenerator) Generate() string {
+	return fmt.Sprintf("%s/%s", g.prefix, randomString(g.length))
+}
+
+func NewRandomKeyGenerator(prefix string, length int) interfaces.KeyGenerator {
+	return &RandomKeyGenerator{
+		prefix: prefix,
+		length: length,
+	}
+}
+
+type StaticKeyGenerator struct {
+	key string
+}
+
+func (g *StaticKeyGenerator) Generate() string {
+	return g.key
+}
+
+func NewStaticKeyGenerator(key string) interfaces.KeyGenerator {
+	return &StaticKeyGenerator{
+		key: key,
+	}
+}
 
 type PingPacketGenerator struct {
 	params *config.Generator

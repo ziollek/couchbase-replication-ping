@@ -92,6 +92,125 @@ func (mr *MockPacketMockRecorder) GetTTL() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTTL", reflect.TypeOf((*MockPacket)(nil).GetTTL))
 }
 
+// MockTiming is a mock of Timing interface.
+type MockTiming struct {
+	ctrl     *gomock.Controller
+	recorder *MockTimingMockRecorder
+}
+
+// MockTimingMockRecorder is the mock recorder for MockTiming.
+type MockTimingMockRecorder struct {
+	mock *MockTiming
+}
+
+// NewMockTiming creates a new mock instance.
+func NewMockTiming(ctrl *gomock.Controller) *MockTiming {
+	mock := &MockTiming{ctrl: ctrl}
+	mock.recorder = &MockTimingMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockTiming) EXPECT() *MockTimingMockRecorder {
+	return m.recorder
+}
+
+// AddChild mocks base method.
+func (m *MockTiming) AddChild(phase string, timing interfaces.Timing) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "AddChild", phase, timing)
+}
+
+// AddChild indicates an expected call of AddChild.
+func (mr *MockTimingMockRecorder) AddChild(phase, timing interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddChild", reflect.TypeOf((*MockTiming)(nil).AddChild), phase, timing)
+}
+
+// AddPhase mocks base method.
+func (m *MockTiming) AddPhase(phase string) interfaces.Timing {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddPhase", phase)
+	ret0, _ := ret[0].(interfaces.Timing)
+	return ret0
+}
+
+// AddPhase indicates an expected call of AddPhase.
+func (mr *MockTimingMockRecorder) AddPhase(phase interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddPhase", reflect.TypeOf((*MockTiming)(nil).AddPhase), phase)
+}
+
+// AddPhaseTry mocks base method.
+func (m *MockTiming) AddPhaseTry(phase string) interfaces.Timing {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddPhaseTry", phase)
+	ret0, _ := ret[0].(interfaces.Timing)
+	return ret0
+}
+
+// AddPhaseTry indicates an expected call of AddPhaseTry.
+func (mr *MockTimingMockRecorder) AddPhaseTry(phase interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddPhaseTry", reflect.TypeOf((*MockTiming)(nil).AddPhaseTry), phase)
+}
+
+// GetDuration mocks base method.
+func (m *MockTiming) GetDuration() time.Duration {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDuration")
+	ret0, _ := ret[0].(time.Duration)
+	return ret0
+}
+
+// GetDuration indicates an expected call of GetDuration.
+func (mr *MockTimingMockRecorder) GetDuration() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDuration", reflect.TypeOf((*MockTiming)(nil).GetDuration))
+}
+
+// GetPhase mocks base method.
+func (m *MockTiming) GetPhase(phase string) time.Duration {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPhase", phase)
+	ret0, _ := ret[0].(time.Duration)
+	return ret0
+}
+
+// GetPhase indicates an expected call of GetPhase.
+func (mr *MockTimingMockRecorder) GetPhase(phase interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPhase", reflect.TypeOf((*MockTiming)(nil).GetPhase), phase)
+}
+
+// GetPhases mocks base method.
+func (m *MockTiming) GetPhases() []string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPhases")
+	ret0, _ := ret[0].([]string)
+	return ret0
+}
+
+// GetPhases indicates an expected call of GetPhases.
+func (mr *MockTimingMockRecorder) GetPhases() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPhases", reflect.TypeOf((*MockTiming)(nil).GetPhases))
+}
+
+// GetRetries mocks base method.
+func (m *MockTiming) GetRetries() int {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRetries")
+	ret0, _ := ret[0].(int)
+	return ret0
+}
+
+// GetRetries indicates an expected call of GetRetries.
+func (mr *MockTimingMockRecorder) GetRetries() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRetries", reflect.TypeOf((*MockTiming)(nil).GetRetries))
+}
+
 // MockGenerator is a mock of Generator interface.
 type MockGenerator struct {
 	ctrl     *gomock.Controller
@@ -116,17 +235,54 @@ func (m *MockGenerator) EXPECT() *MockGeneratorMockRecorder {
 }
 
 // Generate mocks base method.
-func (m *MockGenerator) Generate(arg0, arg1 string) interfaces.Packet {
+func (m *MockGenerator) Generate(key, origin string) interfaces.Packet {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Generate", arg0, arg1)
+	ret := m.ctrl.Call(m, "Generate", key, origin)
 	ret0, _ := ret[0].(interfaces.Packet)
 	return ret0
 }
 
 // Generate indicates an expected call of Generate.
-func (mr *MockGeneratorMockRecorder) Generate(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockGeneratorMockRecorder) Generate(key, origin interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Generate", reflect.TypeOf((*MockGenerator)(nil).Generate), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Generate", reflect.TypeOf((*MockGenerator)(nil).Generate), key, origin)
+}
+
+// MockKeyGenerator is a mock of KeyGenerator interface.
+type MockKeyGenerator struct {
+	ctrl     *gomock.Controller
+	recorder *MockKeyGeneratorMockRecorder
+}
+
+// MockKeyGeneratorMockRecorder is the mock recorder for MockKeyGenerator.
+type MockKeyGeneratorMockRecorder struct {
+	mock *MockKeyGenerator
+}
+
+// NewMockKeyGenerator creates a new mock instance.
+func NewMockKeyGenerator(ctrl *gomock.Controller) *MockKeyGenerator {
+	mock := &MockKeyGenerator{ctrl: ctrl}
+	mock.recorder = &MockKeyGeneratorMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockKeyGenerator) EXPECT() *MockKeyGeneratorMockRecorder {
+	return m.recorder
+}
+
+// Generate mocks base method.
+func (m *MockKeyGenerator) Generate() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Generate")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// Generate indicates an expected call of Generate.
+func (mr *MockKeyGeneratorMockRecorder) Generate() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Generate", reflect.TypeOf((*MockKeyGenerator)(nil).Generate))
 }
 
 // MockChannel is a mock of Channel interface.
@@ -205,29 +361,31 @@ func (m *MockPinger) EXPECT() *MockPingerMockRecorder {
 }
 
 // Ping mocks base method.
-func (m *MockPinger) Ping(arg0 context.Context, arg1 string) error {
+func (m *MockPinger) Ping(ctx context.Context, key string) (interfaces.Timing, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Ping", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret := m.ctrl.Call(m, "Ping", ctx, key)
+	ret0, _ := ret[0].(interfaces.Timing)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Ping indicates an expected call of Ping.
-func (mr *MockPingerMockRecorder) Ping(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockPingerMockRecorder) Ping(ctx, key interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockPinger)(nil).Ping), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockPinger)(nil).Ping), ctx, key)
 }
 
 // Pong mocks base method.
-func (m *MockPinger) Pong(arg0 context.Context, arg1 string) error {
+func (m *MockPinger) Pong(ctx context.Context, key string) (interfaces.Timing, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Pong", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret := m.ctrl.Call(m, "Pong", ctx, key)
+	ret0, _ := ret[0].(interfaces.Timing)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Pong indicates an expected call of Pong.
-func (mr *MockPingerMockRecorder) Pong(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockPingerMockRecorder) Pong(ctx, key interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Pong", reflect.TypeOf((*MockPinger)(nil).Pong), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Pong", reflect.TypeOf((*MockPinger)(nil).Pong), ctx, key)
 }

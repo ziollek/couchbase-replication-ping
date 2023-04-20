@@ -12,6 +12,7 @@ const GenericTimeout = 15 * time.Second
 
 type Couchbase struct {
 	collection *gocb.Collection
+	uri        string
 }
 
 func buildConnectionOptions(c *config.Couchbase) gocb.ClusterOptions {
@@ -37,7 +38,7 @@ func NewKV(c *config.Couchbase) (interfaces.KV, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Couchbase{collection: bucket.DefaultCollection()}, nil
+	return &Couchbase{collection: bucket.DefaultCollection(), uri: c.URI}, nil
 }
 
 func (c *Couchbase) Upsert(key string, value interface{}, expiry time.Duration) error {

@@ -1,11 +1,9 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/spf13/cobra"
-	"github.com/ziollek/couchbase-replication-ping/pkg/config"
+	"github.com/ziollek/couchbase-replication-ping/internal/cmd/utils"
 	"github.com/ziollek/couchbase-replication-ping/pkg/infra"
-	"os"
 	"time"
 )
 
@@ -15,34 +13,25 @@ var pingCmd = &cobra.Command{
 	Short: "measure two way replication latency",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		c, err := config.GetConfig()
-		handleError("cannot load config: %s", err)
-		pinger, err := infra.Build(c)
-		handleError("cannot build pinger: %s", err)
+		pinger, err := infra.BuildPingTracker("static")
+		utils.HandleError("cannot build pinger: %s", err)
 		n, err := cmd.Flags().GetInt("repeat")
-		handleError("improper repeat option: %s", err)
+		utils.HandleError("improper repeat option: %s", err)
+		interval, err := cmd.Flags().GetDuration("interval")
+		utils.HandleError("improper interval option: %s", err)
+		logger := utils.GetLogger()
 
-		fmt.Println("Start measuring latency ... ")
+		logger.Info("Start measuring latency ... ")
 		for i := 1; i <= n; i++ {
-			duration, err := pinger.Ping()
-			fmt.Printf("[%s] ping %d)\tduration: %s, err: %s\n", time.Now().Format("2006-01-02 15:04:05"), i, duration, err)
-			time.Sleep(time.Second)
+			timing, err := pinger.Ping()
+			utils.FormatByTiming(i, timing, err, "ping")
+			time.Sleep(interval)
 		}
 	},
 }
 
-func handleError(format string, err error) {
-	if err != nil {
-		fatal(fmt.Sprintf(format, err))
-	}
-}
-
-func fatal(message string) {
-	fmt.Println(message)
-	os.Exit(1)
-}
-
 func init() {
 	rootCmd.AddCommand(pingCmd)
-	pingCmd.PersistentFlags().Int("repeat", 3, "how many times ping should be repeated")
+	pingCmd.PersistentFlags().Int("repeat", 3, "define how many times ping should be repeated")
+	pingCmd.PersistentFlags().Duration("interval", time.Second, "define pings frequency, default every 1s")
 }

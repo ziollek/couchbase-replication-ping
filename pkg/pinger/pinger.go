@@ -3,6 +3,7 @@ package pinger
 import (
 	"context"
 	"github.com/ziollek/couchbase-replication-ping/pkg/pinger/interfaces"
+	"github.com/ziollek/couchbase-replication-ping/pkg/pinger/model"
 	"time"
 )
 
@@ -26,40 +27,78 @@ func NewReplicationPing(
 	}
 }
 
-func (ping *ReplicationPing) Ping(ctx context.Context, key string) error {
-	if err := ping.txChannel.Send(ping.generator.Generate(key, ping.source)); err != nil {
-		return err
-	}
-	for {
-		if packet, err := ping.rxChannel.Receive(key); err == nil {
-			if packet != nil && packet.GetOrigin() == ping.source {
-				break
-			}
-		}
-		select {
-		case <-time.After(time.Millisecond * 1):
-		case <-ctx.Done():
-			return ctx.Err()
-		}
-	}
-	return nil
+func (ping *ReplicationPing) Ping(ctx context.Context, key string) (interfaces.Timing, error) {
+	return ping.sendAndReceive(ctx, key, ping.source, ping.txChannel)
 }
 
-func (ping *ReplicationPing) Pong(ctx context.Context, key string) error {
-	if err := ping.rxChannel.Send(ping.generator.Generate(key, ping.destination)); err != nil {
-		return err
+func (ping *ReplicationPing) Pong(ctx context.Context, key string) (interfaces.Timing, error) {
+	return ping.sendAndReceive(ctx, key, ping.destination, ping.rxChannel)
+}
+
+func (ping *ReplicationPing) sendAndReceive(
+	ctx context.Context, key, source string, channel interfaces.Channel,
+) (interfaces.Timing, error) {
+	timing := model.NewTimingRecord()
+	err := channel.Send(ping.generator.Generate(key, source))
+	timing.AddPhase("send")
+	if err != nil {
+		return timing, err
 	}
+
 	for {
-		if packet, err := ping.txChannel.Receive(key); err == nil {
-			if packet != nil && packet.GetOrigin() == ping.destination {
+		if packet, err := channel.Receive(key); err == nil {
+			if packet != nil && packet.GetOrigin() == source {
 				break
 			}
 		}
+		timing.AddPhaseTry("wait")
 		select {
 		case <-time.After(time.Millisecond * 1):
 		case <-ctx.Done():
-			return ctx.Err()
+			return timing, ctx.Err()
 		}
 	}
-	return nil
+	return timing.AddPhase("receive"), nil
+}
+
+type ReplicationHalfPing struct {
+	myOrigin  string
+	generator interfaces.Generator
+	channel   interfaces.Channel
+}
+
+func NewReplicationHalfPing(
+	myOrigin string, generator interfaces.Generator, channel interfaces.Channel,
+) interfaces.Pinger {
+	return &ReplicationHalfPing{
+		myOrigin,
+		generator,
+		channel,
+	}
+}
+
+func (ping *ReplicationHalfPing) Ping(ctx context.Context, key string) (interfaces.Timing, error) {
+	timing := model.NewTimingRecord()
+	err := ping.channel.Send(ping.generator.Generate(key, ping.myOrigin))
+	return timing.AddPhase("send"), err
+}
+
+func (ping *ReplicationHalfPing) Pong(ctx context.Context, key string) (interfaces.Timing, error) {
+	timing := model.NewTimingRecord()
+	tries := 0
+	for {
+		if packet, err := ping.channel.Receive(key); err == nil {
+			if packet != nil && packet.GetOrigin() != ping.myOrigin {
+				break
+			}
+		}
+		timing.AddPhaseTry("wait")
+		select {
+		case <-time.After(time.Millisecond * 1):
+			tries++
+		case <-ctx.Done():
+			return timing, ctx.Err()
+		}
+	}
+	return timing.AddPhase("receive"), nil
 }
