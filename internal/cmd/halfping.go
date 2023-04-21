@@ -30,18 +30,14 @@ This logic is repeated as many times as is defined by the repeat flag`,
 			logger.Fatal("Exactly one argument was expected")
 		}
 		origin := args[0]
-
+		logger.Infof("Start measuring latency from %s perspective ... ", origin)
+		params := utils.ProvideParams(cmd)
 		pinger, err := infra.BuildHalfPingTracker(origin)
 		utils.HandleError("cannot build pinger: %s", err)
-		n, err := cmd.Flags().GetInt("repeat")
-		utils.HandleError("improper repeat option: %s", err)
-		interval, err := cmd.Flags().GetDuration("interval")
-		utils.HandleError("improper interval option: %s", err)
+		pinger.WithTimeout(params.Timeout)
 
-		logger.Infof("%v", args)
-
-		logger.Infof("Start measuring latency from %s perspective ... ", origin)
-		for i := 1; i <= n; i++ {
+		logger.Infof("Start measuring latency from %s perspective: %s", origin, params.ToString())
+		for i := 1; i <= params.Repeats; i++ {
 			var timing interfaces.Timing
 			if origin == "source" {
 				timing, err = pinger.Ping()
@@ -49,14 +45,11 @@ This logic is repeated as many times as is defined by the repeat flag`,
 				timing, err = pinger.Pong()
 			}
 			utils.FormatByTiming(i, timing, err, origin)
-			time.Sleep(interval)
+			time.Sleep(params.Interval)
 		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(halfpingCmd)
-
-	halfpingCmd.PersistentFlags().Int("repeat", 3, "define how many times ping should be repeated")
-	halfpingCmd.PersistentFlags().Duration("interval", time.Second, "define pings frequency, default every 1s")
 }
