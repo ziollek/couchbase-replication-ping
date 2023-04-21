@@ -37,5 +37,5 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: ziollek/cb-tracker:latest,ziollek/cb-tracker:${{ steps.tag_version.outputs.version }}
+          tags: ziollek/cb-tracker:latest,ziollek/cb-tracker:${{ steps.tag_version.outputs.new_version }}
           file: docker/Dockerfile
