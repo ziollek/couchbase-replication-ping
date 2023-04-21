@@ -8,9 +8,17 @@ Tool that allows to perform round-trip communication (write-read-overwrite-read)
 2. There is ready to use docker:
 
 ```
-CONFIG=/path/to/your/config.yaml
-docker run -v ${CONFIG}:/config.yml ziollek/cb-tracker:latest oneway
+CB_TRACKER_CONFIG=/path/to/your/config.yaml
+docker run -v ${CB_TRACKER_CONFIG}:/config.yml -it ziollek/cb-tracker:latest oneway
 ```
+
+for example to use config deliverer with repository just use below command (assuming that your pwd is root path of repository):
+
+```
+CB_TRACKER_CONFIG="$(pwd)"/configuration/local.yaml
+docker run -v ${CB_TRACKER_CONFIG}:/config.yml -it ziollek/cb-tracker:latest oneway
+```
+
 Please check below information to know what else can you achieve and how to interpret command output.
 
 ## build
