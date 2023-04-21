@@ -21,18 +21,6 @@ docker run -v ${CB_TRACKER_CONFIG}:/config.yml -it ziollek/cb-tracker:latest one
 
 Please check below information to know what else can you achieve and how to interpret command output.
 
-## build
-
-make build
-
-## run
-
-```
-./bin/cp-tracker ping --config=configuration/local.yaml
-```
-
-notes: example config can be found in [configuration/local.yaml](./configuration/local.yaml)
-
 ## configuration file
 
 The example configuration is presented below:
@@ -79,6 +67,15 @@ additionally you can find here parameters that are used to generate documents wh
 
 
 ## what kind of tests/modes it supports?
+
+### generic parameters for each kind of test
+
+| parameter | type     | default | description                                        | 
+|--------|----------|---------|----------------------------------------------------|
+| interval | duration | 1s      | define interval between consecutive tests          |
+| repeat | int      | 3       | define how many times test should be repeated      |
+| timeout | duration | 10s     | define timeout for a single test                   |
+| json   | flag     | false   | use json as an output instead colored text format  |
 
 ### ping mode - checks full round trip replication time
 
@@ -130,3 +127,22 @@ TBD
 
 Measured times are tightly connected with RTT time between the machine where the test is fired and both clusters/buckets.
 If you want to achieve accurate results you should consider half-ping mode fired on hosts with little RTT to each side of testing buckets.
+
+
+## Development
+
+### run tests
+
+```
+make test
+```
+ 
+
+### build & run
+
+```
+make build
+./bin/cp-tracker ping --config=configuration/local.yaml
+```
+
+notes: example config can be found in [configuration/local.yaml](./configuration/local.yaml)

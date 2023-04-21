@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/ziollek/couchbase-replication-ping/internal/cmd/utils"
 	"os"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -41,6 +42,9 @@ func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cb-tracker.yaml)")
 	rootCmd.PersistentFlags().BoolVar(&jsonOutput, "json", false, "output as a json")
+	rootCmd.PersistentFlags().Duration("timeout", 10*time.Second, "define timeout for a single test (ping)")
+	rootCmd.PersistentFlags().Int("repeat", 3, "define how many times test should be repeated")
+	rootCmd.PersistentFlags().Duration("interval", time.Second, "define interval between consecutive tests, default every 1s")
 }
 
 // initConfig reads in config file and ENV variables if set.

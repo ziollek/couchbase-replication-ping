@@ -46,17 +46,17 @@ func (ping *ReplicationPing) sendAndReceive(
 	}
 
 	for {
+		select {
+		case <-time.After(time.Millisecond * 1):
+		case <-ctx.Done():
+			return timing, ctx.Err()
+		}
 		if packet, err := channel.Receive(key); err == nil {
 			if packet != nil && packet.GetOrigin() == source {
 				break
 			}
 		}
 		timing.AddPhaseTry("wait")
-		select {
-		case <-time.After(time.Millisecond * 1):
-		case <-ctx.Done():
-			return timing, ctx.Err()
-		}
 	}
 	return timing.AddPhase("receive"), nil
 }
@@ -87,18 +87,18 @@ func (ping *ReplicationHalfPing) Pong(ctx context.Context, key string) (interfac
 	timing := model.NewTimingRecord()
 	tries := 0
 	for {
-		if packet, err := ping.channel.Receive(key); err == nil {
-			if packet != nil && packet.GetOrigin() != ping.myOrigin {
-				break
-			}
-		}
-		timing.AddPhaseTry("wait")
 		select {
 		case <-time.After(time.Millisecond * 1):
 			tries++
 		case <-ctx.Done():
 			return timing, ctx.Err()
 		}
+		if packet, err := ping.channel.Receive(key); err == nil {
+			if packet != nil && packet.GetOrigin() != ping.myOrigin {
+				break
+			}
+		}
+		timing.AddPhaseTry("wait")
 	}
 	return timing.AddPhase("receive"), nil
 }

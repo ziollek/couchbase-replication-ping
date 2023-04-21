@@ -13,25 +13,21 @@ var pingCmd = &cobra.Command{
 	Short: "measure two way replication latency",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+		params := utils.ProvideParams(cmd)
 		pinger, err := infra.BuildPingTracker("static")
 		utils.HandleError("cannot build pinger: %s", err)
-		n, err := cmd.Flags().GetInt("repeat")
-		utils.HandleError("improper repeat option: %s", err)
-		interval, err := cmd.Flags().GetDuration("interval")
-		utils.HandleError("improper interval option: %s", err)
+		pinger.WithTimeout(params.Timeout)
 		logger := utils.GetLogger()
 
-		logger.Info("Start measuring latency ... ")
-		for i := 1; i <= n; i++ {
+		logger.Infof("Start measuring latency: %s", params.ToString())
+		for i := 1; i <= params.Repeats; i++ {
 			timing, err := pinger.Ping()
 			utils.FormatByTiming(i, timing, err, "ping")
-			time.Sleep(interval)
+			time.Sleep(params.Interval)
 		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(pingCmd)
-	pingCmd.PersistentFlags().Int("repeat", 3, "define how many times ping should be repeated")
-	pingCmd.PersistentFlags().Duration("interval", time.Second, "define pings frequency, default every 1s")
 }
