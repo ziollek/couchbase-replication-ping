@@ -29,5 +29,5 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: ziollek/cb-tracker:${{ github.event.inputs.forceVersion }}
+          tags: ziollek/cb-tracker:${{ steps.tag_version.outputs.version }}
           file: docker/Dockerfile
