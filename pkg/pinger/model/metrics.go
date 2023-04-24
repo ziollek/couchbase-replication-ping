@@ -35,12 +35,30 @@ func (record *TimingRecord) AddChild(phase string, timing interfaces.Timing) {
 	record.retries[phase] = timing.GetRetries()
 }
 
+func (record *TimingRecord) Combine(timing interfaces.Timing) {
+	for _, phase := range timing.GetPhases() {
+		if _, ok := record.phases[phase]; !ok {
+			record.phases[phase] = time.Duration(0)
+			record.retries[phase] = 0
+		}
+		record.phases[phase] += timing.GetPhase(phase)
+		record.retries[phase] += timing.GetPhaseRetries(phase)
+	}
+}
+
 func (record *TimingRecord) GetPhases() []string {
 	return maps.Keys(record.phases)
 }
 
 func (record *TimingRecord) GetPhase(phase string) time.Duration {
 	if result, ok := record.phases[phase]; ok {
+		return result
+	}
+	return 0
+}
+
+func (record *TimingRecord) GetPhaseRetries(phase string) (result int) {
+	if result, ok := record.retries[phase]; ok {
 		return result
 	}
 	return 0

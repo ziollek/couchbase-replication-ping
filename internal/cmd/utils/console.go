@@ -28,17 +28,25 @@ func GetLogger() *log.Logger {
 }
 
 func FormatByTiming(no int, timing interfaces.Timing, err error, message string) {
-	entry := defaultLogger.WithFields(getTimingFields(timing)).WithField("no", no)
+	FormatByTimingFields(no, GetTimingFields(timing, false), timing.GetRetries(), err, message)
+}
+
+func FormatByTwoWayTiming(no int, timing interfaces.Timing, err error, message string) {
+	FormatByTimingFields(no, GetTimingFields(timing, true), timing.GetRetries(), err, message)
+}
+
+func FormatByTimingFields(no int, timingFields log.Fields, retries int, err error, message string) {
+	entry := defaultLogger.WithFields(timingFields).WithField("no", no)
 	if err != nil {
 		entry.WithError(err).Error(message)
-	} else if timing.GetRetries() > 0 {
+	} else if retries > 0 {
 		entry.Warn(message)
 	} else {
 		entry.Info(message)
 	}
 }
 
-func getTimingFields(timing interfaces.Timing) log.Fields {
+func GetTimingFields(timing interfaces.Timing, twoWay bool) log.Fields {
 	fields := log.Fields{}
 	s := time.Duration(0)
 	n := 0
@@ -50,7 +58,11 @@ func getTimingFields(timing interfaces.Timing) log.Fields {
 		}
 	}
 	if timing.GetPhase("wait") > 0 && n == 2 {
-		fields["latency"] = timing.GetPhase("wait") + s/2
+		if twoWay {
+			fields["latency"] = timing.GetPhase("wait") / 2
+		} else {
+			fields["latency"] = timing.GetPhase("wait") + s/2
+		}
 	}
 	fields["total"] = timing.GetDuration()
 	if timing.GetRetries() > 0 {

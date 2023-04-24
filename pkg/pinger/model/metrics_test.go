@@ -56,3 +56,26 @@ func TestShouldIncludeChildGeneralMetricsAndSumRetries(t *testing.T) {
 	// Then: and sum of all retries (parent & child) should be returned
 	require.Equal(t, 3, parent.GetRetries())
 }
+
+func TestShouldCombineTwoTimingsDurationsAndRetries(t *testing.T) {
+	// Given: timing records first & second
+	first := model.NewTimingRecord()
+	second := model.NewTimingRecord()
+
+	// When: retrying phases on both
+	first.AddPhaseTry("open")
+	first.AddPhaseTry("read")
+	second.AddPhaseTry("read")
+	second.AddPhaseTry("write")
+	// And: add second to first
+	first.Combine(second)
+
+	// Then: phases from both timings should be present
+	require.ElementsMatch(t, []string{"open", "read", "write"}, first.GetPhases())
+	require.True(t, first.GetDuration() > 0)
+	// Then: and retries should be summed
+	require.Equal(t, 1, first.GetPhaseRetries("open"))
+	require.Equal(t, 2, first.GetPhaseRetries("read"))
+	require.Equal(t, 1, first.GetPhaseRetries("write"))
+	require.Equal(t, 4, first.GetRetries())
+}
