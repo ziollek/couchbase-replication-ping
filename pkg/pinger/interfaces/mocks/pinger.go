@@ -155,6 +155,18 @@ func (mr *MockTimingMockRecorder) AddPhaseTry(phase interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddPhaseTry", reflect.TypeOf((*MockTiming)(nil).AddPhaseTry), phase)
 }
 
+// Combine mocks base method.
+func (m *MockTiming) Combine(timing interfaces.Timing) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Combine", timing)
+}
+
+// Combine indicates an expected call of Combine.
+func (mr *MockTimingMockRecorder) Combine(timing interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Combine", reflect.TypeOf((*MockTiming)(nil).Combine), timing)
+}
+
 // GetDuration mocks base method.
 func (m *MockTiming) GetDuration() time.Duration {
 	m.ctrl.T.Helper()
@@ -181,6 +193,20 @@ func (m *MockTiming) GetPhase(phase string) time.Duration {
 func (mr *MockTimingMockRecorder) GetPhase(phase interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPhase", reflect.TypeOf((*MockTiming)(nil).GetPhase), phase)
+}
+
+// GetPhaseRetries mocks base method.
+func (m *MockTiming) GetPhaseRetries(phase string) int {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPhaseRetries", phase)
+	ret0, _ := ret[0].(int)
+	return ret0
+}
+
+// GetPhaseRetries indicates an expected call of GetPhaseRetries.
+func (mr *MockTimingMockRecorder) GetPhaseRetries(phase interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPhaseRetries", reflect.TypeOf((*MockTiming)(nil).GetPhaseRetries), phase)
 }
 
 // GetPhases mocks base method.

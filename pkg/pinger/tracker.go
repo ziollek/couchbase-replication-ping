@@ -10,9 +10,10 @@ import (
 const DefaultTimeout = 10 * time.Second
 
 type PingTracker struct {
-	replPing     interfaces.Pinger
-	keyGenerator interfaces.KeyGenerator
-	timeout      time.Duration
+	replPing        interfaces.Pinger
+	keyGenerator    interfaces.KeyGenerator
+	timeout         time.Duration
+	combineStrategy bool
 }
 
 func (tracker *PingTracker) Ping() (interfaces.Timing, error) {
@@ -21,12 +22,12 @@ func (tracker *PingTracker) Ping() (interfaces.Timing, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), tracker.timeout)
 	defer cancel()
 	pingTiming, err := tracker.replPing.Ping(ctx, key)
-	timing.AddChild("ping", pingTiming)
+	tracker.mergeTimings("ping", timing, pingTiming)
 	if err != nil {
 		return timing, err
 	}
 	pongTiming, err := tracker.replPing.Pong(ctx, key)
-	timing.AddChild("pong", pongTiming)
+	tracker.mergeTimings("pong", timing, pongTiming)
 	if err != nil {
 		return timing, err
 	}
@@ -45,27 +46,41 @@ func (tracker *PingTracker) Pong() (interfaces.Timing, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), tracker.timeout)
 	defer cancel()
 	pongTiming, err := tracker.replPing.Pong(ctx, key)
-	timing.AddChild("ping", pongTiming)
+	tracker.mergeTimings("pong", timing, pongTiming)
 	if err != nil {
 		return timing, err
 	}
 
 	pingTiming, err := tracker.replPing.Ping(ctx, key)
-	timing.AddChild("ping", pingTiming)
+	tracker.mergeTimings("ping", timing, pingTiming)
 	if err != nil {
 		return timing, err
 	}
 	return timing, nil
 }
 
+func (tracker *PingTracker) mergeTimings(phase string, parent, child interfaces.Timing) interfaces.Timing {
+	if tracker.combineStrategy {
+		parent.Combine(child)
+	} else {
+		parent.AddChild(phase, child)
+	}
+	return parent
+}
+
 func (tracker *PingTracker) WithTimeout(timeout time.Duration) {
 	tracker.timeout = timeout
 }
 
+func (tracker *PingTracker) WithCombineTimings(combineStrategy bool) {
+	tracker.combineStrategy = combineStrategy
+}
+
 func NewPingTracker(ping interfaces.Pinger, generator interfaces.KeyGenerator) *PingTracker {
 	return &PingTracker{
-		replPing:     ping,
-		keyGenerator: generator,
-		timeout:      DefaultTimeout,
+		replPing:        ping,
+		keyGenerator:    generator,
+		timeout:         DefaultTimeout,
+		combineStrategy: false,
 	}
 }

@@ -16,8 +16,10 @@ type Timing interface {
 	AddPhase(phase string) Timing
 	AddPhaseTry(phase string) Timing
 	AddChild(phase string, timing Timing)
+	Combine(timing Timing)
 	GetPhases() []string
 	GetPhase(phase string) time.Duration
+	GetPhaseRetries(phase string) int
 	GetDuration() time.Duration
 	GetRetries() int
 }

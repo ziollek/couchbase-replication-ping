@@ -35,6 +35,7 @@ This logic is repeated as many times as is defined by the repeat flag`,
 		pinger, err := infra.BuildHalfPingTracker(origin)
 		utils.HandleError("cannot build pinger: %s", err)
 		pinger.WithTimeout(params.Timeout)
+		pinger.WithCombineTimings(true)
 
 		logger.Infof("Start measuring latency from %s perspective: %s", origin, params.ToString())
 		for i := 1; i <= params.Repeats; i++ {
@@ -44,7 +45,7 @@ This logic is repeated as many times as is defined by the repeat flag`,
 			} else {
 				timing, err = pinger.Pong()
 			}
-			utils.FormatByTiming(i, timing, err, origin)
+			utils.FormatByTwoWayTiming(i, timing, err, origin)
 			time.Sleep(params.Interval)
 		}
 	},
