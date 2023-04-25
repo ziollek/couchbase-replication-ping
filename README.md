@@ -63,7 +63,7 @@ additionally you can find here parameters that are used to generate documents wh
 |------|-------------------------------------------------------------------------------------|
 | ttl  | ttl of documents that are generated during tests |
 | size | size in bytes of data field of documents that are generated during tests, it worth mentioning that document consists of several additional fields and are a little bigger than defined size|
-| key  | depending of command it is key that is used for storing testing documents or prefix of documents key |
+| key  | depending on command it is a key that is used for storing testing documents or prefix of documents keys |
 
 
 ## what kind of tests/modes it supports?
