@@ -182,7 +182,7 @@ WARN[2023-04-25 05:51:59] source                                        latency=
 INFO[2023-04-25 05:52:00] source                                        no=3 receive=2.111094ms send=1.43418ms total=3.545274ms
 ```
 
-run as source part:
+run as destination part:
 
 ```
  ./bin/cb-tracker halfping --config=configuration/local.yaml destination
