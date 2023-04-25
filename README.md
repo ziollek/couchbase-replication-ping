@@ -90,7 +90,7 @@ additionally you can find here parameters that are used to generate documents wh
 
    b. fetch <- Source (with retires)
 
-It can be visualised be below sequence diagram:
+This mode is visualized be below sequence diagram:
 
 ```mermaid
 sequenceDiagram
@@ -135,10 +135,38 @@ One way is similar to ping but checks only one way replication lag (from source 
 It estimates lag by writing the document in a bucket defined as a source and tries to read it from a bucket configured as a destination.
 The interpretation of the output is similar like for a half ping mode.
 
+This mode is visualized be below sequence diagram:
+
+```mermaid
+sequenceDiagram
+    cb-tracker->>+Source: Save document with content A under random key
+    Source->>-cb-tracker: Document is saved
+    Source->>+Destination: XDCR replication
+    cb-tracker->>+Destination: Get document (possible retries due to replication lag)
+    Destination->>-cb-tracker: Serve document with content A
+```
+
 
 ### half ping mode - run two processes that connected only with one side (source or destination)
 
-This approach allows to mitigate variety of RTT while connecting to both sides of replication from single host
+This approach allows to mitigate variety of RTT while connecting to both sides of replication from single host.
+
+This mode is visualized be below sequence diagram:
+
+```mermaid
+sequenceDiagram
+    cb-tracker-source->>+Source: Save document with content A under a static key
+    Source->>-cb-tracker-source: Document is saved
+    Source->>+Destination: XDCR replication
+    cb-tracker-destination->>+Destination: Get document (possible retries due to replication lag)
+    Destination->>-cb-tracker-destination: Serve document with content A
+    cb-tracker-destination->>+Destination: Save document with content B under a static key
+    Destination->>-cb-tracker-destination: Document is saved
+    Destination->>+Source: XDCR replication
+    cb-tracker-source->>+Source: Get document (possible retries due to replication lag)
+    Source->>-cb-tracker-source: Serve document with content B
+```
+
 
 ### run
 
